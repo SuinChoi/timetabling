@@ -143,7 +143,7 @@ public class Timeslot
 
 public class Unit
 {
-    public int UnitId { get; }
+    public string UnitId { get; }
     public string UnitName { get; }
     public int UnitCredit { get; }
     public int MaxStudents { get; }
@@ -152,8 +152,10 @@ public class Unit
     public string AssignedStaff { get; set; }
    // public List<Student> EnrolledStudents { get; }
     public List<Timeslot> AvailableTimeslots { get; }
+    
 
-    public Unit(int unitId, string unitName, int unitCredit, int maxStudents, Unit prerequisiteUnit, string requirement)
+
+    public Unit(string unitId, string unitName, int unitCredit, int maxStudents, Unit prerequisiteUnit, string requirement)
     {
         UnitId = unitId;
         UnitName = unitName;
@@ -164,6 +166,30 @@ public class Unit
         AssignedStaff = null;
        // EnrolledStudents = new List<Student>();
         AvailableTimeslots = new List<Timeslot>();
+    }
+    static List<Unit> ReadUnitsFromCSV(string filePath)
+    {
+        List<Unit> units = new List<Unit>();
+        var lines = File.ReadLines(filePath);
+
+        foreach(var line in lines.Skip(1)) // Skip the header line
+    {
+            var fields = line.Split(',');
+            if (fields.Length >= 2) // CSV 파일에서 "Unit Code"와 "Unit Title" 필드만 사용
+            {
+                string unitId = fields[0]; // "Unit Code"를 "unitId"로 매핑
+                string unitName = fields[1]; // "Unit Title"을 "unitName"으로 매핑
+
+                // 나머지 필드는 필요에 따라 파싱할 수 있습니다.
+                int unitCredit = 0;
+                int maxStudents = 0;
+
+                Unit unit = new Unit(unitId, unitName, unitCredit, maxStudents, null, null);
+                units.Add(unit);
+            }
+        }
+
+        return units;
     }
 
     public void AssignStaff(string staff)
@@ -219,7 +245,7 @@ class Program
         Timeslot timeslot2 = new Timeslot(2, "Monday", new DateTime(2023, 10, 16, 10, 45, 0), new DateTime(2023, 10, 16, 12, 15, 0));
 
         // Create a unit
-        Unit computerScience101 = new Unit(1, "Introduction to Computer Science", 3, 30, null, "None");
+        Unit computerScience101 = new Unit("unit1001", "Introduction to Computer Science", 3, 30, null, "None");
 
         // Assign staff to the unit
         //Staff professorSmith = new Staff("Prof. Smith");
