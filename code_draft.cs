@@ -47,34 +47,43 @@ public class Venue
     public static List<Venue> ReadVenuesFromCSV(string filePath)
     {
         List<Venue> venues = new List<Venue>();
-        var lines = File.ReadLines(filePath);
 
-        // Skip the first line (column headers)
-        bool firstLine = true;
-
-        foreach (var line in lines)
+        using (var reader = new StreamReader(filePath)) // Open the file and ensure it's properly closed
         {
-            if (firstLine)
-            {
-                firstLine = false;
-                continue; // Skip the first line
-            }
+            // Skip the first line (column headers)
+            bool firstLine = true;
+            int lineNumber = 0; // Initialize a line number counter
 
-            var fields = line.Split(',');
-            if (fields.Length >= 4)
+            while (!reader.EndOfStream)
             {
-                int venueId = int.Parse(fields[0]);
-                string venueName = fields[1];
-                string location = fields[2];
-                int capacity = int.Parse(fields[3]);
+                var line = reader.ReadLine();
+                lineNumber++; // Increment the line number for each line read
 
-                Venue venue = new Venue(venueId, location, venueName, capacity);
-                venues.Add(venue);
+                if (firstLine)
+                {
+                    firstLine = false;
+                    continue; // Skip the first line
+                }
+
+                var fields = line.Split(','); // Change the delimiter to a comma
+                if (fields.Length >= 4)
+                {
+                    int venueId = int.Parse(fields[0]);
+                    string venueName = fields[1];
+                    string location = fields[2];
+                    int capacity = int.Parse(fields[3]);
+
+                    //Console.WriteLine("Read lines: " + lineNumber); // Use lineNumber to count lines
+                    Venue venue = new Venue(venueId, location, venueName, capacity);
+                    venues.Add(venue);
+                }
             }
         }
 
         return venues;
     }
+
+
 
     public void BookTimeslot(Timeslot timeslot)
     {
@@ -316,27 +325,21 @@ class Program
         // Output some information
         Console.WriteLine("University Name: " + university.Name);
         Console.WriteLine("Department Name: " + computerScience.Name);
-        Console.WriteLine("--------------------------------------------");
-        Console.WriteLine("Venue Name: " + venues[0].VenueName);
-        Console.WriteLine("Venue Name: " + venues[1].VenueName);
-        //Console.WriteLine("Unit Name: " + computerScience101.UnitName);
 
-        /*
-        Console.WriteLine("Timeslots for the Unit:");
-        foreach (var timeslot in computerScience101.AvailableTimeslots)
-        {
-            Console.WriteLine("TimeSlot ID: " + timeslot.TimeSlotId);
-            Console.WriteLine("Day of Week: " + timeslot.DayOfWeek);
-            Console.WriteLine("Start Time: " + timeslot.StartTime);
-            Console.WriteLine("End Time: " + timeslot.EndTime);
-            Console.WriteLine();
-        }*/
-        // For each unit, you can work with available timeslots, assign staff, etc.
         Console.WriteLine("--------------------------------------------");
+        foreach (var venue in venues)
+        {
+            Console.WriteLine("Venue ID: " + venue.VenueId);
+            Console.WriteLine("Venue Name: " + venue.VenueName);
+            Console.WriteLine("");
+        }
+       Console.WriteLine("--------------------------------------------");
         foreach (var unit in units)
         {
+            Console.WriteLine("Unit Id: " + unit.UnitId);
             Console.WriteLine("Unit Name: " + unit.UnitName);
             Console.WriteLine("Unit Lecturer: " + unit.Lecturer);
+            Console.WriteLine("");
         }
     }
 }
